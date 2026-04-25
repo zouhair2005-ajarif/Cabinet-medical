@@ -4,7 +4,13 @@ Application web de gestion d'un cabinet médical développée avec **Laravel 13*
 
 > Projet académique — Licence Informatique S6 | Faculté des Sciences Semlalia, UCA Marrakech
 
-🌐 **Application en ligne : [cabinet-medical-production-7b99.up.railway.app](https://cabinet-medical-production-7b99.up.railway.app/)**
+## 🌐 Démonstration
+
+L'application est exposée via **ngrok** (tunneling local) — le lien fonctionne uniquement quand le PC de développement est allumé.
+
+> ⚠️ Pour tester l'application, contacter l'équipe pour planifier une démonstration en direct.
+
+Le déploiement sur **Railway** a été tenté mais a rencontré des incompatibilités entre la version PHP disponible sur Railway (8.2/8.3) et les dépendances du projet qui nécessitent **PHP 8.4**. La solution adoptée est **ngrok** comme alternative.
 
 ##  Fonctionnalités
 
@@ -19,7 +25,7 @@ Application web de gestion d'un cabinet médical développée avec **Laravel 13*
 
 `Laravel 13` · `PHP 8.4` · `MySQL 8` · `Bootstrap 5` · `Eloquent ORM` · `Laravel Breeze` · `DomPDF` · `PHPUnit`
 
-## 🚀 Installation
+##  Installation
 
 ```bash
 git clone https://github.com/votre-username/cabinet-medical.git
@@ -32,27 +38,33 @@ php artisan migrate --seed
 php artisan serve
 ```
 
-## 🗄️ Base de données & Seeders
-
-Les migrations et seeders sont inclus dans le projet.  
-Une seule commande suffit pour créer toutes les tables ET insérer les données de démonstration :
+## 🌍 Lancer la démonstration publique (ngrok)
 
 ```bash
-php artisan migrate --seed
+# Terminal 1
+php artisan serve
+
+# Terminal 2
+ngrok http 8000
 ```
 
-Pour réinitialiser complètement la base de données :
+Le lien public généré sera de la forme : `https://xxxx.ngrok-free.app`
+
+## 🗄️ Base de données & Seeders
 
 ```bash
+# Créer les tables + insérer les données de démonstration
+php artisan migrate --seed
+
+# Réinitialiser complètement
 php artisan migrate:fresh --seed
 ```
 
-**Ce qui est créé automatiquement :**
-- ✅ 10 tables (users, patients, medecins, rendezvous, consultations, ordonnances...)
-- ✅ 6 comptes de démonstration (admin, 2 médecins, secrétaire, 2 patients)
+- ✅ 10 tables créées automatiquement
+- ✅ 6 comptes de démonstration insérés
 - ✅ Données de test (rendez-vous, dossiers médicaux, disponibilités)
 
-> ⚠️ Ne pas oublier de configurer `DB_DATABASE`, `DB_USERNAME` et `DB_PASSWORD` dans le fichier `.env` avant de lancer les migrations.
+> ⚠️ Configurer `DB_DATABASE`, `DB_USERNAME` et `DB_PASSWORD` dans `.env` avant de lancer les migrations.
 
 ## 🔑 Comptes de test — mot de passe : `password`
 
