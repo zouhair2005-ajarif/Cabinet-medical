@@ -1,52 +1,23 @@
-FROM php:8.2-apache
+FROM php:8.4-cli
 
-# Installer les extensions nécessaires
+# Extensions PHP
 RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    zip \
-    unzip \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    nodejs \
-    npm \
-    && docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    mbstring \
-    zip \
-    gd
+    git curl zip unzip libzip-dev libpng-dev \
+    libxml2-dev libonig-dev nodejs npm \
+    && docker-php-ext-install pdo pdo_mysql mbstring xml curl zip gd
 
-# Installer Composer
-RUN curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/composer
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Configurer Apache
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-RUN a2enmod rewrite
-
-# Copier le projet
-WORKDIR /var/www/html
+WORKDIR /app
 COPY . .
 
-# Installer les dépendances
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN npm install && npm run build
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html/storage \
-    && chown -R www-data:www-data /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
+EXPOSE 8000
 
-# Script de démarrage
-COPY docker-start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
-
-EXPOSE 80
-CMD ["/usr/local/bin/start.sh"]
+CMD php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=$PORT
